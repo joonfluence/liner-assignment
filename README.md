@@ -12,7 +12,70 @@
 ## ERD 및 DDL, 실행계획
 
 ```sql
+CREATE TABLE users (
+    id BigInt PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL
+);
 
+CREATE TABLE pages (
+    id BigInt PRIMARY KEY,
+    url VARCHAR(2083) NOT NULL, -- URL 길이를 고려하여 2083자로 설정
+    title VARCHAR(255) NOT NULL,
+    user_id BigInt NOT NULL,
+    CONSTRAINT fk_page_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETEs CASCADE
+);
+
+CREATE INDEX idx_page_user_id ON pages (user_id);
+
+CREATE TABLE highlights (
+    id BigInt PRIMARY KEY,
+    highlighted_text TEXT NOT NULL,
+    color_bar VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    page_id BigInt NOT NULL,
+    user_id BigInt NOT NULL,
+    CONSTRAINT fk_highlight_pages FOREIGN KEY (page_id) REFERENCES pages (id) ON DELETEs CASCADE,
+    CONSTRAINT fk_highlight_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETEs CASCADE
+);
+
+CREATE INDEX idx_highlight_page_id ON highlights (page_id);
+CREATE INDEX idx_highlight_user_id ON highlights (user_id);
+
+CREATE TABLE feed_items (
+    id BigInt PRIMARY KEY,
+    user_id BigInt NOT NULL,
+    page_id BigInt NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    visibility VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_feed_item_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_feed_item_pages FOREIGN KEY (page_id) REFERENCES pages (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_feed_item_user_id ON feed_items (user_id);
+CREATE INDEX idx_feed_item_page_id ON feed_items (page_id);
+CREATE INDEX idx_feed_item_visibility ON feed_items (visibility);
+
+CREATE TABLE feed_item_mentioned_userss (
+    feed_item_id BigInt NOT NULL,
+    mentioned_user_id BigInt NOT NULL,
+    PRIMARY KEY (feed_item_id, mentioned_user_id),
+    CONSTRAINT fk_feed_item_mentioned_feed_item FOREIGN KEY (feed_item_id) REFERENCES feed_items (id) ON DELETEs CASCADE,
+    CONSTRAINT fk_feed_item_mentioned_users FOREIGN KEY (mentioned_user_id) REFERENCES users (id) ON DELETEs CASCADE
+);
+
+CREATE INDEX idx_feed_item_mentioned_users ON feed_item_mentioned_userss (mentioned_user_id);
+
+CREATE TABLE feed_item_highlights (
+    id BigInt PRIMARY KEY,
+    feed_item_id BigInt NOT NULL,
+    highlight_id BigInt NOT NULL,
+    CONSTRAINT fk_feed_item_highlight_feed_item FOREIGN KEY (feed_item_id) REFERENCES feed_items (id) ON DELETE CASCADE,
+    CONSTRAINT fk_feed_item_highlight_highlight FOREIGN KEY (highlight_id) REFERENCES highlights (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_feed_item_highlight_feed_item_id ON feed_item_highlights (feed_item_id);
+CREATE INDEX idx_feed_item_highlight_highlight_id ON feed_item_highlights (highlight_id);
 ```
 
 ```sql
