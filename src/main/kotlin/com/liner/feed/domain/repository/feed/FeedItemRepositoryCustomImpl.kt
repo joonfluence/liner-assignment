@@ -71,6 +71,7 @@ class FeedItemRepositoryCustomImpl : FeedItemRepositoryCustom,
 
         val content = query
             .where(condition)
+            .orderBy(feedItem.firstHighlightedAt.desc())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()

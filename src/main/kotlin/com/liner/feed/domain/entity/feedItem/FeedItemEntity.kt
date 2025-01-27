@@ -21,4 +21,5 @@ class FeedItemEntity(
     val createdAt: LocalDateTime,
     @Enumerated(EnumType.STRING)
     val visibility: VisibilityType,
+    val firstHighlightedAt: LocalDateTime,
 )

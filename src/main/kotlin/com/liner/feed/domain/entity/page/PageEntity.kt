@@ -18,5 +18,4 @@ class PageEntity(
     val userId: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
-    val firstHighlightedAt: LocalDateTime?,
 )

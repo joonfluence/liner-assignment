@@ -15,7 +15,7 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleExceptions(ex: Exception): ResponseEntity<Map<String, String?>> {
         val errors = mapOf(
-            "errorMessage" to ErrorCodes.GLOBAL_ERROR.message,
+            "errorMessage" to ex.localizedMessage,
             "statusCode" to HttpStatus.INTERNAL_SERVER_ERROR.name
         )
 

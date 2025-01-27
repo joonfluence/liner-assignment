@@ -83,10 +83,11 @@ CREATE INDEX idx_feed_item_visibility ON feed_items (visibility);
 CREATE INDEX idx_feed_item_user_page_visibility ON feed_items (user_id, page_id, visibility);
 ```  
 
-  - feed_items 테이블의 user_id와 page_id에 인덱스를 추가하고, pages.first_highlighted_at에도 인덱스를 추가하여 쿼리 성능을 크게 향상시켰습니다.
+  - feed_items 테이블의 user_id와 page_id에 인덱스를 추가하고, feed_items.first_highlighted_at에도 인덱스를 추가하여 쿼리 성능을 크게 향상시켰습니다.
+    - 참고로 feed_items.first_highlighted_at은 해당 유저의 피드 아이템 중 가장 최근에 하이라이팅된 페이지의 시간을 나타냅니다. 
 
 ```sql
-CREATE INDEX idx_pages_first_highlighted_at ON pages (first_highlighted_at);
+CREATE INDEX idx_pages_first_highlighted_at ON feed_items (first_highlighted_at);
 ```
 
   - 서브쿼리 (SELECT feed_item_id FROM feed_item_mentioned_users WHERE mentioned_user_id = ?)는 성능에 영향을 미칠 수 있어, 이 부분에 인덱스를 추가하여 최적화 하였습니다.
@@ -135,7 +136,6 @@ CREATE TABLE pages
     url                VARCHAR(2083) NOT NULL, -- URL 길이를 고려하여 2083자로 설정
     title              VARCHAR(255)  NOT NULL,
     user_id            BigInt        NOT NULL,
-    first_highlighted_at TIMESTAMP     NULL,
     created_at         TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by         VARCHAR(255),
     updated_at         TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -143,7 +143,6 @@ CREATE TABLE pages
 );
 
 CREATE INDEX idx_page_user_id ON pages (user_id);
-CREATE INDEX idx_page_first_highlighted_at ON pages (first_highlighted_at);
 
 CREATE TABLE highlights
 (
@@ -171,13 +170,15 @@ CREATE TABLE feed_items
     created_by VARCHAR(255),
     updated_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by VARCHAR(255),
-    visibility VARCHAR(20) NOT NULL
+    visibility VARCHAR(20) NOT NULL,
+    first_highlighted_at TIMESTAMP NOT NULL
 );
 
 CREATE INDEX idx_feed_item_user_id ON feed_items (user_id);
 CREATE INDEX idx_feed_item_page_id ON feed_items (page_id);
 CREATE INDEX idx_feed_item_visibility ON feed_items (visibility);
 CREATE INDEX idx_feed_item_user_page_visibility ON feed_items (user_id, page_id, visibility);
+CREATE INDEX idx_feed_item_first_highlighted_at ON feed_items (first_highlighted_at);
 
 CREATE TABLE feed_item_mentioned_users
 (
@@ -187,7 +188,8 @@ CREATE TABLE feed_item_mentioned_users
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by        VARCHAR(255),
     updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by        VARCHAR(255)
+    updated_by        VARCHAR(255),
+    first_highlighted_at TIMESTAMP     NULL
 );
 
 CREATE INDEX idx_feed_item_feed_item_id ON feed_item_mentioned_users (feed_item_id);
