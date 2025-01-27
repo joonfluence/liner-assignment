@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: liner-feed-app
+  profiles:
+    active: local
+redis:
+  host: localhost
+  port: 6379
+jwt:
+  secret: A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6A7B8C9D0E1F2
+  expiration: 1800000
+  header: Authorization
+  prefix: Bearer
+logging:
+  level:
+    root: info

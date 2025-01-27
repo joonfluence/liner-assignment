@@ -4,12 +4,53 @@
 
 ## 순서
 
+## 🛠 기술 스택
+
+- Language: Kotlin 1.9 (JVM 17)
+- Backend: Spring Boot 3.2.5, JPA
+- Database: MySQL 8.0
+- API Testing: JUnit5
+- Containerization: Docker, Docker Compose
+- 인메모리 데이터 그리드: Redisson
+
+## 확인 순서
+
+1. Docker 실행 (Docker 설치 방법 : https://docs.docker.com/get-docker/)
+
+- Docker Desktop을 설치하고 실행합니다.
+- Docker Compose 를 설치하고 실행합니다.
+
+```bash
+docker-compose up -d 
+```
+
+- MySQL 서버 시작: MySQL 서버가 시작되면 애플리케이션은 MySQL을 사용하여 데이터를 저장합니다.
+- DDL 실행
+    - (만약 테이블이 정상적으로 생성되지 않았다면) 아래 파일을 확인하여 MySQL 서버 내에 테이블을 생성합니다.
+    - /src/main/resources/sql/ddl.sql
+
+
+2. **애플리케이션 실행**
+
+```bash
+./gradlew bootRun
+```
+
+3. 테스트코드 실행 확인
+
+```bash
+./gradlew test
+```
+
+4. **API 호출**: Swagger 링크를 통해 API를 호출할 수 있습니다.
 
 ## 주요 기능
 
 - 하이라이팅: 피드 하이라이팅 기능
 
 ## ERD 및 DDL, 실행계획
+
+![ERD.png](/src/main/resources/file/img.png)
 
 ```sql
 CREATE TABLE users (
@@ -22,8 +63,7 @@ CREATE TABLE pages (
     id BigInt PRIMARY KEY,
     url VARCHAR(2083) NOT NULL, -- URL 길이를 고려하여 2083자로 설정
     title VARCHAR(255) NOT NULL,
-    user_id BigInt NOT NULL,
-    CONSTRAINT fk_page_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETEs CASCADE
+    user_id BigInt NOT NULL
 );
 
 CREATE INDEX idx_page_user_id ON pages (user_id);
@@ -34,9 +74,7 @@ CREATE TABLE highlights (
     color_bar VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     page_id BigInt NOT NULL,
-    user_id BigInt NOT NULL,
-    CONSTRAINT fk_highlight_pages FOREIGN KEY (page_id) REFERENCES pages (id) ON DELETEs CASCADE,
-    CONSTRAINT fk_highlight_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETEs CASCADE
+    user_id BigInt NOT NULL
 );
 
 CREATE INDEX idx_highlight_page_id ON highlights (page_id);
@@ -47,9 +85,7 @@ CREATE TABLE feed_items (
     user_id BigInt NOT NULL,
     page_id BigInt NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    visibility VARCHAR(20) NOT NULL,
-    CONSTRAINT fk_feed_item_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_feed_item_pages FOREIGN KEY (page_id) REFERENCES pages (id) ON DELETE CASCADE
+    visibility VARCHAR(20) NOT NULL
 );
 
 CREATE INDEX idx_feed_item_user_id ON feed_items (user_id);
@@ -59,9 +95,7 @@ CREATE INDEX idx_feed_item_visibility ON feed_items (visibility);
 CREATE TABLE feed_item_mentioned_userss (
     feed_item_id BigInt NOT NULL,
     mentioned_user_id BigInt NOT NULL,
-    PRIMARY KEY (feed_item_id, mentioned_user_id),
-    CONSTRAINT fk_feed_item_mentioned_feed_item FOREIGN KEY (feed_item_id) REFERENCES feed_items (id) ON DELETEs CASCADE,
-    CONSTRAINT fk_feed_item_mentioned_users FOREIGN KEY (mentioned_user_id) REFERENCES users (id) ON DELETEs CASCADE
+    PRIMARY KEY (feed_item_id, mentioned_user_id)
 );
 
 CREATE INDEX idx_feed_item_mentioned_users ON feed_item_mentioned_userss (mentioned_user_id);
@@ -69,81 +103,9 @@ CREATE INDEX idx_feed_item_mentioned_users ON feed_item_mentioned_userss (mentio
 CREATE TABLE feed_item_highlights (
     id BigInt PRIMARY KEY,
     feed_item_id BigInt NOT NULL,
-    highlight_id BigInt NOT NULL,
-    CONSTRAINT fk_feed_item_highlight_feed_item FOREIGN KEY (feed_item_id) REFERENCES feed_items (id) ON DELETE CASCADE,
-    CONSTRAINT fk_feed_item_highlight_highlight FOREIGN KEY (highlight_id) REFERENCES highlights (id) ON DELETE CASCADE
+    highlight_id BigInt NOT NULL
 );
 
 CREATE INDEX idx_feed_item_highlight_feed_item_id ON feed_item_highlights (feed_item_id);
 CREATE INDEX idx_feed_item_highlight_highlight_id ON feed_item_highlights (highlight_id);
-```
-
-```sql
-
-```
-
-## 🛠 기술 스택
-
-- Backend: Spring Boot, JPA
-- Database: MySQL
-- API Testing: JUnit
-- Containerization: Docker
-
-## 설치 방법
-
-1. 프로젝트 클론
-
-```
-git clone https://github.com/username/repository-name.git
-cd repository-name
-```
-2. 환경 변수 설정
-
-다음 환경 변수를 설정합니다:
-
-```
-export DB_HOST=your-database-host
-export DB_USER=your-database-user
-export DB_PASSWORD=your-database-password
-```
-
-3. 의존성 설치
-
-Gradle을 사용하여 의존성을 설치합니다.
-
-```
-./gradlew build
-```
-
-4. 데이터베이스 설정
-
-application.properties 또는 application.yml 파일을 설정하여 데이터베이스 연결 정보를 구성합니다.
-
-5. 서버 실행
-
-```
-./gradlew bootRun
-```
-
-6. Docker로 실행 (선택 사항)
-
-```
-docker build -t project-name .
-docker run -p 8080:8080 project-name
-```
-
-7. 단위 테스트
-
-코드 변경 후 단위 테스트를 실행하여 기능이 정상적으로 동작하는지 확인합니다.
-
-```
-./gradlew test
-```
-
-2. 통합 테스트
-
-SpringBootTest와 MockMvc를 사용하여 API 통합 테스트를 실행할 수 있습니다.
-
-```
-./gradlew test --tests "com.example.project.SomeTest"
 ```

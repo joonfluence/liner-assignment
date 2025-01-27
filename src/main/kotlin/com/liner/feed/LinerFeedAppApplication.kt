@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class LinerFeedAppApplication
 
 fun main(args: Array<String>) {
-  runApplication<LinerFeedAppApplication>(*args)
+    runApplication<LinerFeedAppApplication>(*args)
 }
