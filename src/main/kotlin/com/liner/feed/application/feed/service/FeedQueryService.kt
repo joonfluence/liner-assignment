@@ -17,6 +17,10 @@ class FeedQueryService(
     private val feedItemRepository: FeedItemRepository,
     private val highlightRepository: HighlightRepository,
 ) {
+    companion object {
+        const val MINIMUM_HIGHLIGHTS = 3
+    }
+
     fun getFeeds(dto: FeedItemSearchDto, pageable: Pageable): Page<FeedItemDto> {
         val feedItems = feedItemRepository.findFeedItems(dto, pageable)
         val content = feedItems.content
@@ -26,11 +30,11 @@ class FeedQueryService(
         val highlights = highlightRepository.findByPageIdInAndUserId(pageIds, dto.userId)
         val pageMap = highlights.groupBy { it.pageId }
         content.forEach { feedItem ->
-            val highlightsByPage = pageMap[feedItem.page.id]?.take(3) ?: emptyList()
-            val highlightDtos = highlightsByPage.map { highlight ->
+            val entities = pageMap[feedItem.page.id]?.take(MINIMUM_HIGHLIGHTS) ?: emptyList()
+            val dtos = entities.map { highlight ->
                 HighlightDto.from(highlight)
             }
-            feedItem.updateHighlights(highlightDtos)
+            feedItem.updateHighlights(dtos)
         }
 
         return PageImpl(

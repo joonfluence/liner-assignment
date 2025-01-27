@@ -3,13 +3,12 @@ package com.liner.feed.application.feed.response
 import com.liner.feed.application.feed.dto.FeedItemDto
 import com.liner.feed.application.feed.dto.HighlightDto
 import com.liner.feed.application.feed.dto.PageDto
-import com.liner.feed.application.feed.dto.UserDto
 import java.time.LocalDateTime
 
 data class FeedResponse(
-    val user: UserResponse,
-    val highlights: List<HighlightResponse>,
-    val page: PageResponse,
+    val user: FeedUserResponse,
+    val highlights: List<FeedHighlightResponse>,
+    val page: FeedPageResponse,
     val createdAt: LocalDateTime,
 ) {
     companion object {
@@ -17,35 +16,27 @@ data class FeedResponse(
             dto: FeedItemDto,
         ): FeedResponse {
             return FeedResponse(
-                UserResponse.from(dto.user),
-                dto.highlights.map { HighlightResponse.from(it) },
-                PageResponse.from(dto.page),
+                FeedUserResponse.from(dto.user),
+                dto.highlights.map { FeedHighlightResponse.from(it) },
+                FeedPageResponse.from(dto.page),
                 dto.createdAt,
             )
         }
     }
 }
 
-data class UserResponse(val id: Long, val name: String) {
+data class FeedHighlightResponse(val id: Long, val color: String, val text: String) {
     companion object {
-        fun from(dto: UserDto): UserResponse {
-            return UserResponse(dto.id, dto.name)
+        fun from(dto: HighlightDto): FeedHighlightResponse {
+            return FeedHighlightResponse(dto.id, dto.color, dto.text)
         }
     }
 }
 
-data class HighlightResponse(val id: Long, val color: String, val text: String) {
+data class FeedPageResponse(val id: Long, val url: String, val title: String) {
     companion object {
-        fun from(dto: HighlightDto): HighlightResponse {
-            return HighlightResponse(dto.id, dto.color, dto.text)
-        }
-    }
-}
-
-data class PageResponse(val id: Long, val url: String, val title: String) {
-    companion object {
-        fun from(dto: PageDto): PageResponse {
-            return PageResponse(dto.id, dto.url, dto.title)
+        fun from(dto: PageDto): FeedPageResponse {
+            return FeedPageResponse(dto.id, dto.url, dto.title)
         }
     }
 }

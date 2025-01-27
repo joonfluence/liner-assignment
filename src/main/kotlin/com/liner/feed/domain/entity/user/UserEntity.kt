@@ -12,4 +12,5 @@ class UserEntity(
     @GeneratedValue
     val id: Long = 0,
     val name: String,
+    val userName: String,
 )

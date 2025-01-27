@@ -21,6 +21,7 @@ data class FeedItemDto(
 data class UserDto(
     val id: Long,
     val name: String,
+    val userName: String,
 )
 
 data class PageDto(

@@ -38,6 +38,7 @@ class FeedItemRepositoryCustomImpl : FeedItemRepositoryCustom,
                             UserDto::class.java,
                             user.id,
                             user.name,
+                            user.userName,
                         ),
                         Projections.constructor(
                             PageDto::class.java,
