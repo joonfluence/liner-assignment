@@ -41,7 +41,8 @@ docker-compose up -d # 프로젝트 루트 디렉토리에서 실행
 ./gradlew test
 ```
 
-4. **API 호출**: Swagger 링크를 통해 API를 호출할 수 있습니다.
+4. **API 호출**: Postman 링크를 통해 API를 호출할 수 있습니다.
+   - https://documenter.getpostman.com/view/18460012/2sAYQi9mex
 
 ## 주요 기능
 
